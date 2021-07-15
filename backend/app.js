@@ -1,12 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const nocache = require("nocache");
 
 const User = require('./models/User');
 const Sauces = require('./models/Sauces');
 
 
 mongoose.connect('mongodb+srv://jord140:qyyH5Pu11O8IVD2s@cluster0.g3ksp.mongodb.net/test', {
+  useCreateIndex: true,
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -17,13 +19,38 @@ const app = express();
 
 
 app.use((req, res, next) => {
+  // on indique que les ressources peuvent être partagées depuis n'importe quelle origine
+
   res.setHeader('Access-Control-Allow-Origin', '*');
+
+ // on indique les entêtes qui seront utilisées après la pré-vérification cross-origin afin de donner l'autorisation
+
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+
+// on indique les méthodes autorisées pour les requêtes HTTP
+
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+
+  // on autorise ce serveur à fournir des scripts pour la page visitée
+
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
   next();
 });
 
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+// On utilise une méthode body-parser pour la transformation du corps de la requête en JSON.
+
+// Transforme les données arrivant de la requête POST en un objet JSON.
 app.use(bodyParser.json())
+
+// On utilise helmet pour plusieurs raisons notamment la mise en place du X-XSS-Protection afin d'activer le filtre de script intersites(XSS) dans les navigateurs web
+app.use(helmet());
+
+//Désactive la mise en cache du navigateur
+app.use(nocache());
 
 app.post('/api/auth/signup', (req, res, next) => {
   delete req.body._id;
