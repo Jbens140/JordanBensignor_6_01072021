@@ -1,11 +1,16 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const nocache = require("nocache");
-const helmet = require("helmet");
+const express = require('express'); // Importation d'express => Framework basé sur node.js
+const bodyParser = require('body-parser'); // Permet d'extraire l'objet JSON des requêtes POST
+const mongoose = require('mongoose'); // Plugin Mongoose pour se connecter à la data base Mongo Db
+const nocache = require("nocache"); //Désactive la mise en cache du navigateur
+const helmet = require("helmet");// il sécurise nos requêtes HTTP
+const cors = require('cors'); // cors: manage cross-origin resource sharing
+const path = require('path'); // Plugin qui sert dans l'upload des images et permet de travailler avec les répertoires et chemin de fichier
 
-const User = require('./models/User');
-const Sauces = require('./models/Sauces');
+
+// On importe la route dédiée aux sauces
+const saucesRoutes = require('./routes/Sauces');
+// On importe la route dédiée aux utilisateurs
+const userRoutes = require('./routes/User');
 
 
 mongoose.connect('mongodb+srv://jord140:qyyH5Pu11O8IVD2s@cluster0.g3ksp.mongodb.net/test', {
@@ -16,24 +21,31 @@ mongoose.connect('mongodb+srv://jord140:qyyH5Pu11O8IVD2s@cluster0.g3ksp.mongodb.
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-const app = express();
+// L'application utilise le framework express
+  const app = express();
+
+// il sécurise nos requêtes HTTP
+app.use(helmet());
+
+// sécurisation cors: origin localhost:3000
+app.use(cors({origin: 'http://localhost:3000'}));
+
+//Désactive la mise en cache du navigateur
+app.use(nocache());
+
+// Midleware qui permet de charger les fichiers qui sont dans le repertoire images
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
+// Middleware Header pour contourner les erreurs en débloquant certains systèmes de sécurité CORS
 app.use((req, res, next) => {
   // on indique que les ressources peuvent être partagées depuis n'importe quelle origine
-
   res.setHeader('Access-Control-Allow-Origin', '*');
-
  // on indique les entêtes qui seront utilisées après la pré-vérification cross-origin afin de donner l'autorisation
-
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-
 // on indique les méthodes autorisées pour les requêtes HTTP
-
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-
   // on autorise ce serveur à fournir des scripts pour la page visitée
-
   res.setHeader('Content-Security-Policy', "default-src 'self'");
   next();
 });
@@ -53,99 +65,10 @@ app.use(helmet());
 //Désactive la mise en cache du navigateur
 app.use(nocache());
 
-app.post('/api/auth/signup', (req, res, next) => {
-  delete req.body._id;
+// Va servir les routes dédiées aux sauces
+app.use('/api/Sauces', saucesRoutes);
 
-  const User = new User({
-    email: req.body.email, password: req.body.password
-  });
-  User.save()
-    .then(() => res.status(201).json({ message: 'Utilisateur enregistré !' }))
-    .catch(error => res.status(400).json({ error }));
-});
-
-app.post('/api/auth/login', (req, res, next) => {
-  delete req.body._id;
-  User.findOne({ email, password })
-    .then(() => res.status(200).json({ message: '******' }))
-    .catch(error => res.status(400).json({ error }));
-});
-
-app.get('/api/sauces', (req, res, next) => {
-  Sauces.find()
-    .then(things => res.status(200).json(things))
-    .catch(error => res.status(400).json({ error }));
-});
-
-app.get('/api/sauces/:id', (req, res, next) => {
-  Sauces.findOne({ _id: req.params.id })
-    .then(things => res.status(200).json(things))
-    .catch(error => res.status(400).json({ error }));
-});
-
-app.post('/api/sauces', (req, res, next) => {
-  delete req.body._id;
-
-  const Sauce = new Sauce({
-    id: req.body.id, imageUrl: req.body.imageUrl,
-  });
-  Sauce.save()
-      .then(() => res.status(201).json({ message: 'Sauce enregistrée !'}))
-      .catch(error => res.status(400).json({ error }));
-});
-
-app.put('/api/sauces/:id', (req, res, next) => {
-
-  Sauce.updateOne({ _id: req.body.id }, { imageUrl: req.body.imageUrl })
-    .then(() => res.status(200).json({ message: 'Objet modifié !' }))
-    .catch(error => res.status(400).json({ error }));
-});
-
-app.delete('/api/sauces/:id', (req, res, next) => {
-  Sauce.deleteOne({ _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet supprimé !' }))
-    .catch(error => res.status(400).json({ error }));
-
-});
-
-app.post('/api/sauces/:id/like', (req, res, next) => {
-  delete req.body._id;
-
-
-});
-
-// app.post('/api/stuff', (req, res, next) => {
-//   delete req.body._id;
-//   const thing = new Thing({
-//     ...req.body
-//   });
-//   thing.save()
-//     .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-//     .catch(error => res.status(400).json({ error }));
-// });
-
-// app.put('/api/stuff/:id', (req, res, next) => {
-//   Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-//     .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-//     .catch(error => res.status(400).json({ error }));
-// });
-
-// app.delete('/api/stuff/:id', (req, res, next) => {
-//   Thing.deleteOne({ _id: req.params.id })
-//     .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-//     .catch(error => res.status(400).json({ error }));
-// });
-
-// app.get('/api/stuff/:id', (req, res, next) => {
-//   Thing.findOne({ _id: req.params.id })
-//     .then(thing => res.status(200).json(thing))
-//     .catch(error => res.status(404).json({ error }));
-// });
-
-// app.get('/api/stuff', (req, res, next) => {
-//   Thing.find()
-//     .then(things => res.status(200).json(things))
-//     .catch(error => res.status(400).json({ error }));
-// });
+// Va servir les routes dédiées aux utilisateurs
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
