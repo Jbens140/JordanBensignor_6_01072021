@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const nocache = require("nocache");
+const helmet = require("helmet");
 
 const User = require('./models/User');
 const Sauces = require('./models/Sauces');

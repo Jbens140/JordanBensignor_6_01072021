@@ -1,7 +1,7 @@
 
 // Création d'un model user avec mongoose, on importe donc mongoose
 const mongoose = require('mongoose');
-require('mongoose-type-email');
+
 
 const uniqueValidator = require('mongoose-unique-validator');
 const sanitizerPlugin = require('mongoose-sanitizer-plugin');
