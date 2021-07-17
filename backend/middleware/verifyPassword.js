@@ -1,4 +1,4 @@
-const passwordSchema = require('../models/password');
+const passwordSchema = require('../models/Password');
 
 
 // vérifie que le mot de passe valide le schema décrit

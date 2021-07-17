@@ -33,4 +33,4 @@ const sauceSchema = mongoose.Schema({
 
 sauceSchema.plugin(sanitizerPlugin);
 
-module.exports = mongoose.model('Sauce', sauceSchema);
+module.exports = mongoose.model('Sauces', sauceSchema);

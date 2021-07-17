@@ -1,6 +1,7 @@
 const bcrypt =  require('bcrypt');   // pour crypter le mot de passe                                                 
 const jwt =     require('jsonwebtoken'); // attribution d'un token lors de la connexion de l'utilisateur                                            
-const User =    require('../models/User'); 
+const User =    require('../models/User');
+const maskemail = require('maskemail') // permet crympter les emails 
 
 exports.signup = (req, res, next) => {
     // On appelle la méthode hash de bcrypt et on lui passe le mdp de l'utilisateur, le salte (10) ce sera le nombre de tours qu'on fait faire à l'algorithme
@@ -10,7 +11,7 @@ exports.signup = (req, res, next) => {
         // Création du nouvel utilisateur avec le model mongoose
         const user = new User({
           // On passe l'email qu'on trouve dans le corps de la requête
-          email: req.body.email,
+          email: maskemail(req.body.email),
           // On récupère le mdp hashé de bcrypt
           password: hash
         });
