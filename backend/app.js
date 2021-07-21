@@ -27,8 +27,6 @@ mongoose.connect('mongodb+srv://jord140:qyyH5Pu11O8IVD2s@cluster0.g3ksp.mongodb.
 // il sécurise nos requêtes HTTP
 app.use(helmet());
 
-// sécurisation cors: origin localhost:3000
-app.use(cors({origin: 'http://localhost:3000'}));
 
 //Désactive la mise en cache du navigateur
 app.use(nocache());
@@ -40,13 +38,13 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // Middleware Header pour contourner les erreurs en débloquant certains systèmes de sécurité CORS
 app.use((req, res, next) => {
   // on indique que les ressources peuvent être partagées depuis n'importe quelle origine
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
  // on indique les entêtes qui seront utilisées après la pré-vérification cross-origin afin de donner l'autorisation
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
 // on indique les méthodes autorisées pour les requêtes HTTP
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   // on autorise ce serveur à fournir des scripts pour la page visitée
-  res.setHeader('Content-Security-Policy', "default-src 'self'");
+  // res.setHeader('Content-Security-Policy', "default-src 'self'");
   next();
 });
 

@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema({
         type: String,
         unique: true,
         required: [true, "Veuillez entrer votre adresse email"],
-        match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Veuillez entrer une adresse email correcte"]
+        // match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Veuillez entrer une adresse email correcte"]
     },
 
     // enregistrement du mot de pass 

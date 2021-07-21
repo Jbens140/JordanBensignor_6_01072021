@@ -32,10 +32,12 @@ exports.signup = (req, res, next) => {
 
   exports.login = (req, res, next) => {
     // On doit trouver l'utilisateur dans la BDD qui correspond à l'adresse entrée par l'utilisateur
+    console.log(req.body.email)
     User.findOne({
-        email: req.body.email
+        email: maskemail(req.body.email)
       })
       .then(user => {
+       console.log(user)
         // Si on trouve pas l'utilisateur on va renvoyer un code 401 "non autorisé"
         if (!user) {
           return res.status(401).json({
