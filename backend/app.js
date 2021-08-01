@@ -12,8 +12,9 @@ const saucesRoutes = require('./routes/Sauces');
 // On importe la route dédiée aux utilisateurs
 const userRoutes = require('./routes/User');
 
+require("dotenv").config();
 
-mongoose.connect('mongodb+srv://jord140:qyyH5Pu11O8IVD2s@cluster0.g3ksp.mongodb.net/test', {
+mongoose.connect(process.env.URL_MONGO, {
   useCreateIndex: true,
   useNewUrlParser: true,
   useUnifiedTopology: true
